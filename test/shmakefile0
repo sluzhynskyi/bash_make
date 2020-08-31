@@ -1,0 +1,16 @@
+all: f
+
+f: a b c
+	echo "building f"
+
+b:
+	echo "building b"
+c:
+	echo "building c"
+
+a: x y
+	echo "building a"
+y:
+	echo "building y"
+x:
+	echo "building x"

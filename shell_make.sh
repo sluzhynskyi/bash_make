@@ -43,12 +43,16 @@ declare -a orders
 IFS=$'\n'
 while read -r line; do
     # reading each line
-    IFS=':' read -r -a array <<<"$line"
-    if [ ${#array[1]} -gt 0 ]; then
+    if [[ $line == *:* ]]; then
+        IFS=':' read -r -a array <<<"$line"
         orders+=("${array[0]}")
         target="${array[0]}"
         dependencies="${array[1]}"
-        targets["$target"]="$dependencies"
+        if [[ -n $dependencies ]]; then
+            targets["$target"]="$dependencies"
+        else
+            targets["$target"]=""
+        fi
     fi
 
     if grep -q -P "^\t" <<<"$line"; then
@@ -68,19 +72,19 @@ fi
 #    echo "${targets[$key]}"
 #done
 #for key in "${commands[@]}"; do echo "$key"; done
+#for key in "${!targets[@]}"; do echo "$key"; done
 for key in "${!targets[@]}"; do builds[$key]=false; done
 #for value in "${targets[@]}"; do echo "$value"; done
 IFS=" "
 make() {
     if [ "${builds[$1]}" = false ]; then
         builds[$1]=true
-        #    echo "in make"
         dep="${targets[$1]}" # Get dependencies for target
-        #    read -r -a arr_dep -d '' <<<"$dep" #
         for d in $dep; do
             d_t="${d//[$'\t\r\n ']/}"
             [ -n "$d_t" ] && [ ${targets[$d_t]+abc} ] && make "$d_t"
         done
+        echo "${commands[$1]}"
         [ ${commands[$1]+abc} ] && eval "${commands[$1]}"
     fi
 }
