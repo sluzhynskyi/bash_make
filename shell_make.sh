@@ -55,8 +55,9 @@ while read -r line; do
         fi
     fi
 
-    if grep -q -P "^\t" <<<"$line"; then
-        commands["$target"]="$line"
+    if [[ $line =~ ^$(printf '\t').* ]]; then
+        c="${line/$(printf '\t')/}"
+        commands["$target"]="$c"
     fi
 done <"$filename"
 
