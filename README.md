@@ -7,7 +7,7 @@
 
 1. Clone the project.
     ```bash
-    git clone git@github.com:chernetskyi/cpp-template.git
+    git clone https://github.com/sluzhynskyi/mymake.git
     ```
 2. Done... 
 
