@@ -65,17 +65,9 @@ if [ $# -gt 0 ]; then
     start_targets=("$@")
 else
     start_targets=("${orders[0]}")
-#    echo "${start_targets[0]}"
 fi
 
-#for key in "${orders[@]}"; do
-#    echo "$key"
-#    echo "${targets[$key]}"
-#done
-#for key in "${commands[@]}"; do echo "$key"; done
-#for key in "${!targets[@]}"; do echo "$key"; done
 for key in "${!targets[@]}"; do builds[$key]=false; done
-#for value in "${targets[@]}"; do echo "$value"; done
 function older_modified() {
     if [[ $1 -ot $2 ]]; then #  FILE1 is older than FILE2
         return 1
