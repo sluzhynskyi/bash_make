@@ -76,6 +76,13 @@ fi
 #for key in "${!targets[@]}"; do echo "$key"; done
 for key in "${!targets[@]}"; do builds[$key]=false; done
 #for value in "${targets[@]}"; do echo "$value"; done
+function older_modified() {
+    if [[ $1 -ot $2 ]]; then #  FILE1 is older than FILE2
+        return 1
+    fi
+    return 0
+}
+
 IFS=" "
 make() {
     if [ "${builds[$1]}" = false ]; then
@@ -83,13 +90,32 @@ make() {
         dep="${targets[$1]}" # Get dependencies for target
         for d in $dep; do
             d_t="${d//[$'\t\r\n ']/}"
-            [ -n "$d_t" ] && [ ${targets[$d_t]+abc} ] && make "$d_t"
+            if [ -n "$d_t" ]; then
+                make "$d_t"
+            else
+                echo "No rule to make target '$d'. Stop" && exit 1
+            fi
         done
-        echo "${commands[$1]}"
-        [ ${commands[$1]+abc} ] && eval "${commands[$1]}"
+        m=0
+        f=0
+        for d in $dep; do
+            d_t="${d//[$'\t\r\n ']/}"
+            if [ -n "$d_t" ]; then
+                if [[ $1 = *.* ]] && [[ -f $d ]]; then
+                    f=1
+                    if older_modified "$d" "$1"; then
+                        m=1
+                    fi
+                fi
+            fi
+        done
+        if [[ ${commands[$1]+abc} ]] && { [[ $m == 1 ]] || [[ $f == 0 ]]; }; then
+            echo "${commands[$1]}"
+            eval "${commands[$1]}"
+        fi
     fi
 }
 for t in "${start_targets[@]}"; do
-    ! [ ${targets["$t"]+abc} ] && echo "This target does not exist" && exit 1
+    ! [ ${targets["$t"]+abc} ] && echo " No rule to make target '$t'. Stop" && exit 1
     make "$t"
 done

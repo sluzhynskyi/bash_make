@@ -1,1 +1,17 @@
-# here would be tests with files
+all: hellomake
+
+hellomake: test/helper_files/main_file.o test/helper_files/file1.o test/helper_files/file2.o
+	g++ test/helper_files/main_file.o test/helper_files/file1.o test/helper_files/file2.o -o test/helper_files/hellomake
+
+test/helper_files/main_file.o: test/helper_files/main_file.cpp test/helper_files/file1.h test/helper_files/file2.h
+	g++ -c test/helper_files/main_file.cpp -o test/helper_files/main_file.o
+
+test/helper_files/file1.o: test/helper_files/file1.cpp  test/helper_files/file1.h
+	g++ -c test/helper_files/file1.cpp -o test/helper_files/file1.o
+
+test/helper_files/file2.o: test/helper_files/file2.cpp  test/helper_files/file2.h
+	g++ -c test/helper_files/file2.cpp -o test/helper_files/file2.o
+
+.PHONY : clean
+clean:
+	rm -rf *.o test/helper_files/hellomake
